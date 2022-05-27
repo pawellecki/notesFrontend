@@ -1,10 +1,7 @@
-import type { Component } from 'solid-js';
-import Table from '@suid/material/Table';
-import TableBody from '@suid/material/TableBody';
+import { Component, mapArray } from 'solid-js';
 import TableCell from '@suid/material/TableCell';
-import TableContainer from '@suid/material/TableContainer';
-import TableHead from '@suid/material/TableHead';
 import TableRow from '@suid/material/TableRow';
+import { Table, Button } from '../../components';
 
 const rows = [
   { title: 'ehe', tags: ['js', 'frontend'] },
@@ -14,15 +11,9 @@ const rows = [
 const Notes: Component = () => {
   return (
     <div>
+      <Button>sd</Button>
       all notes
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Dessert (100g serving)</TableCell>
-            <TableCell align="right">Calories</TableCell>
-          </TableRow>
-        </TableHead>
-      </Table>
+      <Table />
     </div>
   );
 };
