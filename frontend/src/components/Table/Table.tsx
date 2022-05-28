@@ -1,51 +1,33 @@
 import { Component, JSX, mapArray } from 'solid-js';
-import MuiTable from '@suid/material/Table';
-import TableBody from '@suid/material/TableBody';
-import TableCell from '@suid/material/TableCell';
 import TableContainer from '@suid/material/TableContainer';
+import Paper from '@suid/material/Paper';
+import MuiTable from '@suid/material/Table';
 import TableHead from '@suid/material/TableHead';
+import TableBody from '@suid/material/TableBody';
 import TableRow from '@suid/material/TableRow';
+import TableCell from '@suid/material/TableCell';
 
-type Props = {};
+type Props = {
+  cols: string[];
+  children: JSX.Element;
+};
 
-const rows = [
-  { title: 'ehe', tags: ['js', 'frontend'] },
-  { title: 'nope', tags: ['node', 'backend'] },
-];
-
-const Table: Component = () => {
-  return (
-    <div>
-      all notes
-      <MuiTable>
-        <TableHead>
-          <TableRow>
-            {/* {mapArray(
-              () => cols,
-              (col) => col
-            )} */}
-            {/* <TableCell>Dessert (100g serving)</TableCell> */}
-            {/* <TableCell align="right">Calories</TableCell> */}
-          </TableRow>
-        </TableHead>
-        <TableBody>
+const Table: Component<Props> = ({ cols, children }) => (
+  <TableContainer component={Paper}>
+    <MuiTable>
+      <TableHead>
+        <TableRow>
           {mapArray(
-            () => rows,
-            (row) => (
-              <TableRow
-              // sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {row.title}
-                </TableCell>
-                <TableCell align="right">{row.tags.join(', ')}</TableCell>
-              </TableRow>
+            () => cols,
+            (col) => (
+              <TableCell>{col}</TableCell>
             )
           )}
-        </TableBody>
-      </MuiTable>
-    </div>
-  );
-};
+        </TableRow>
+      </TableHead>
+      <TableBody>{children}</TableBody>
+    </MuiTable>
+  </TableContainer>
+);
 
 export default Table;
