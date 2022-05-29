@@ -1,7 +1,7 @@
 const { randomUUID } = require('crypto');
 const HttpError = require('../models/http-error');
 
-const mockNotes = [
+let mockNotes = [
   {
     id: '11',
     tags: ['js', 'node'],
@@ -20,15 +20,15 @@ const getNoteById = (req, res, next) => {
   res.json({ note });
 };
 
-const getNoteByUserId = (req, res, next) => {
+const getNotesByUserId = (req, res, next) => {
   const userId = req.params.id;
-  const note = mockNotes.find((note) => note.creatorId === userId);
+  const notes = mockNotes.filter((note) => note.creatorId == userId);
 
-  if (!note) {
-    return next(new HttpError("User note doesn't exist", 404));
+  if (!notes || notes.length === 0) {
+    return next(new HttpError('Could not find any notes of this user', 404));
   }
 
-  res.json({ note });
+  res.json({ notes });
 };
 
 const addNote = (req, res, next) => {
@@ -45,6 +45,29 @@ const addNote = (req, res, next) => {
   res.status(201).json(newNote);
 };
 
+const editNote = (req, res, next) => {
+  const { tags } = req.body;
+  const { id } = req.params;
+
+  const updatedNote = { ...mockNotes.find((note) => note.id === id) };
+  const noteIndex = mockNotes.findIndex((note) => note.id === id);
+  updatedNote.tags = tags;
+
+  mockNotes[noteIndex] = updatedNote;
+
+  res.status(201).json({ note: updatedNote });
+};
+
+const deleteNote = (req, res, next) => {
+  const { id } = req.params;
+
+  mockNotes = mockNotes.filter((note) => note.id !== id);
+
+  res.status(200).json({ message: 'Delete success', id });
+};
+
 exports.getNoteById = getNoteById;
-exports.getNoteByUserId = getNoteByUserId;
+exports.getNotesByUserId = getNotesByUserId;
 exports.addNote = addNote;
+exports.editNote = editNote;
+exports.deleteNote = deleteNote;
