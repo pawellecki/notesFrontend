@@ -2,7 +2,7 @@ const express = require('express');
 
 const {
   getNoteById,
-  getNoteByUserId,
+  getNotesByUserId,
   addNote,
   editNote,
   deleteNote,
@@ -11,7 +11,7 @@ const {
 const router = express.Router();
 
 router.get('/:id', getNoteById);
-router.get('user/:id', getNoteByUserId);
+router.get('user/:id', getNotesByUserId);
 
 router.post('/', addNote);
 
