@@ -1,7 +1,7 @@
-const { randomUUID } = require('crypto');
 const { validationResult } = require('express-validator');
 
 const HttpError = require('../models/http-error');
+const Note = require('../models/note');
 
 let mockNotes = [
   {
@@ -34,24 +34,29 @@ const getNotesByUserId = (req, res, next) => {
   res.json({ notes });
 };
 
-const addNote = (req, res, next) => {
+const addNote = async (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    throw new HttpError('Invalid inputs passed, check data', 422);
+    return next(new HttpError('Invalid inputs passed, check dataa', 422));
   }
 
-  const { title, tags } = req.body;
-
-  const newNote = {
-    id: randomUUID(),
+  const { title, tags, creatorId } = req.body;
+  console.log('req', req.body);
+  const newNote = new Note({
     title,
     tags,
-  };
+    //   image: { type: String, required: true },
+    creatorId,
+  });
 
-  mockNotes.push(newNote);
+  try {
+    await newNote.save();
+  } catch (err) {
+    return next(new HttpError('Did not add new note', 500));
+  }
 
-  res.status(201).json(newNote);
+  res.status(201).json({ note: newNote });
 };
 
 const editNote = (req, res, next) => {
