@@ -12,7 +12,7 @@ const {
 const router = express.Router();
 
 router.get('/:id', getNoteById);
-router.get('user/:id', getNotesByUserId);
+router.get('/user/:id', getNotesByUserId);
 
 router.post(
   '/',

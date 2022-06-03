@@ -3,18 +3,16 @@ const { validationResult } = require('express-validator');
 const HttpError = require('../models/http-error');
 const Note = require('../models/note');
 
-let mockNotes = [
-  {
-    id: '11',
-    title: 'first note',
-    tags: ['js', 'node'],
-    creatorId: 999,
-  },
-];
-
-const getNoteById = (req, res, next) => {
+const getNoteById = async (req, res, next) => {
   const noteId = req.params.id;
-  const note = mockNotes.find((note) => note.id === noteId);
+
+  let note;
+
+  try {
+    note = await Note.findById(noteId);
+  } catch (err) {
+    return next(new HttpError('Could not find note', 500));
+  }
 
   if (!note) {
     throw new HttpError("Note doesn't exist", 404);
@@ -23,15 +21,22 @@ const getNoteById = (req, res, next) => {
   res.json({ note });
 };
 
-const getNotesByUserId = (req, res, next) => {
+const getNotesByUserId = async (req, res, next) => {
   const userId = req.params.id;
-  const notes = mockNotes.filter((note) => note.creatorId == userId);
+
+  let notes;
+
+  try {
+    notes = await Note.find({ creatorId: userId });
+  } catch (err) {
+    return next(new HttpError('Could not fetch notes', 500));
+  }
 
   if (!notes || notes.length === 0) {
     return next(new HttpError('Could not find any notes of this user', 404));
   }
 
-  res.json({ notes });
+  res.json({ notes: notes.map((note) => note.toObject({ getters: true })) });
 };
 
 const addNote = async (req, res, next) => {
@@ -59,35 +64,51 @@ const addNote = async (req, res, next) => {
   res.status(201).json({ note: newNote });
 };
 
-const editNote = (req, res, next) => {
+const editNote = async (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    throw new HttpError('Invalid inputs passed, check data', 422);
+    return next(new HttpError('Invalid inputs passed, check data', 422));
   }
 
   const { title, tags } = req.body;
   const { id } = req.params;
 
-  const updatedNote = { ...mockNotes.find((note) => note.id === id) };
-  const noteIndex = mockNotes.findIndex((note) => note.id === id);
-  updatedNote.title = title;
-  updatedNote.tags = tags;
+  let note;
 
-  mockNotes[noteIndex] = updatedNote;
-
-  res.status(201).json({ note: updatedNote });
-};
-
-const deleteNote = (req, res, next) => {
-  const { id } = req.params;
-  const deletedNote = mockNotes.find((note) => note.id === id);
-
-  if (!deletedNote) {
-    throw new HttpError('Could not find and delete this note', 422);
+  try {
+    note = await Note.findById(id);
+  } catch (err) {
+    return next(new HttpError('Edit failed, could not find note', 500));
   }
 
-  mockNotes = mockNotes.filter((note) => note.id !== id);
+  note.title = title;
+  note.tags = tags;
+
+  try {
+    await note.save();
+  } catch (err) {
+    return next(new HttpError('Edit failed, could not save changes', 500));
+  }
+
+  res.status(201).json({ note: note.toObject({ getters: true }) });
+};
+
+const deleteNote = async (req, res, next) => {
+  const { id } = req.params;
+  let note;
+
+  try {
+    note = await Note.findById(id);
+  } catch (err) {
+    return next(new HttpError('Could not find and delete this note', 422));
+  }
+
+  try {
+    await note.remove();
+  } catch (err) {
+    return next(new HttpError('Could not delete this note', 422));
+  }
 
   res.status(200).json({ message: 'Delete success', id });
 };
