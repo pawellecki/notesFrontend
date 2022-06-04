@@ -1,19 +1,19 @@
 const { validationResult } = require('express-validator');
 
 const HttpError = require('../models/http-error');
+const user = require('../models/user');
 const User = require('../models/user');
 
-const mockUsers = [
-  {
-    id: 'u1',
-    name: 'pawel',
-    email: 'aa@aa.com',
-    password: 'uuu',
-  },
-];
+const getUsers = async (req, res, next) => {
+  let users;
 
-const getUsers = (req, res, next) => {
-  res.json({ users: mockUsers });
+  try {
+    users = await User.find({}, 'email name');
+  } catch (err) {
+    return next(new HttpError('fetching users failed', 500));
+  }
+
+  res.json({ users: users.map((user) => user.toObject({ getters: true })) });
 };
 
 const signup = async (req, res, next) => {
@@ -58,16 +58,23 @@ const signup = async (req, res, next) => {
   res.status(201).json({ user: newUser.toObject({ getters: true }) });
 };
 
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  const identyfiedUser = mockUsers.find((user) => user.email === email);
-
-  if (!identyfiedUser || identyfiedUser.password !== password) {
-    throw new HttpError('Could not identyfy user, wrong credentials', 401);
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email });
+  } catch (err) {
+    return next(new HttpError('logging in failed, try again later', 500));
   }
 
-  res.json({ message: 'loged in' });
+  if (!existingUser || existingUser.password !== password) {
+    return next(
+      new HttpError('invalid credentials, could not log you in', 401)
+    );
+  }
+
+  res.json({ message: 'logged in' });
 };
 
 exports.getUsers = getUsers;
