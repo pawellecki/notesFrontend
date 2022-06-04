@@ -15,7 +15,7 @@ const getNoteById = async (req, res, next) => {
   }
 
   if (!note) {
-    throw new HttpError("Note doesn't exist", 404);
+    return next(new HttpError("Note doesn't exist", 404));
   }
 
   res.json({ note });
