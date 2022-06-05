@@ -1,7 +1,9 @@
 const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 
 const HttpError = require('../models/http-error');
 const Note = require('../models/note');
+const User = require('../models/user');
 
 const getNoteById = async (req, res, next) => {
   const noteId = req.params.id;
@@ -47,7 +49,7 @@ const addNote = async (req, res, next) => {
   }
 
   const { title, tags, creatorId } = req.body;
-  console.log('req', req.body);
+
   const newNote = new Note({
     title,
     tags,
@@ -55,10 +57,29 @@ const addNote = async (req, res, next) => {
     creatorId,
   });
 
+  let user;
   try {
-    await newNote.save();
+    user = await User.findById(creatorId);
   } catch (err) {
-    return next(new HttpError('Did not add new note', 500));
+    return next(new HttpError('Did not add new note1', 500));
+  }
+
+  if (!user) {
+    return next(new HttpError('Could not find author of note', 404));
+  }
+
+  try {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    await newNote.save({ session });
+    user.notes.push(newNote);
+
+    await user.save({ session });
+
+    await session.commitTransaction();
+  } catch (err) {
+    return next(new HttpError('Did not add new note2', 500));
   }
 
   res.status(201).json({ note: newNote });

@@ -25,7 +25,7 @@ const signup = async (req, res, next) => {
     );
   }
 
-  const { name, email, password, notes } = req.body;
+  const { name, email, password } = req.body;
 
   let existingUser;
   try {
@@ -46,7 +46,7 @@ const signup = async (req, res, next) => {
     password,
     image:
       'https://image.shutterstock.com/image-photo/closeup-portrait-funny-ginger-cat-600w-1563541219.jpg',
-    notes,
+    notes: [],
   });
 
   try {
