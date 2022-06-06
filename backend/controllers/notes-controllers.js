@@ -117,16 +117,27 @@ const editNote = async (req, res, next) => {
 
 const deleteNote = async (req, res, next) => {
   const { id } = req.params;
-  let note;
 
+  let note;
   try {
-    note = await Note.findById(id);
+    note = await Note.findById(id).populate('creatorId');
   } catch (err) {
-    return next(new HttpError('Could not find and delete this note', 422));
+    return next(new HttpError('Could not delete this note', 422));
+  }
+
+  if (!note) {
+    return next(new HttpError('Could not find and delete this note', 404));
   }
 
   try {
-    await note.remove();
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    await note.remove({ session });
+    note.creatorId.notes.pull(note);
+    await note.creatorId.save({ session });
+
+    await session.commitTransaction();
   } catch (err) {
     return next(new HttpError('Could not delete this note', 422));
   }
