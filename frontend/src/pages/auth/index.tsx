@@ -1,6 +1,7 @@
 import type { Component } from 'solid-js';
 import { createSignal } from 'solid-js';
 import { createForm } from '@felte/solid';
+import toast from 'solid-toast';
 import Input from '../../components/Form/Input/Input';
 import Button from '../../components/Button/Button';
 
@@ -38,6 +39,7 @@ const Auth: Component = () => {
           const responseData = await response.json();
           console.log('responseDataa', responseData);
         } catch (err) {
+          toast.error(err.message || 'Something went wrong');
           console.log('log in err', err);
         }
       }

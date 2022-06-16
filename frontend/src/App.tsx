@@ -1,6 +1,7 @@
 import type { Component } from 'solid-js';
 import { createSignal } from 'solid-js';
 import { Routes, Route } from 'solid-app-router';
+import { Toaster } from 'solid-toast';
 import styles from './App.module.css';
 import Tinder from './pages/tinder';
 import Notes from './pages/notes';
@@ -19,6 +20,7 @@ const App: Component = () => {
     <div class={styles.App}>
       <div>heeeeeeeeader</div>
       <div>sidebar</div>
+      <Toaster />
       <Routes>
         {isLoggedIn() ? (
           <>
