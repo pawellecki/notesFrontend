@@ -15,8 +15,11 @@
     "vite-plugin-solid": "^2.2.6"
   },
   "dependencies": {
+    "@felte/solid": "^1.2.2",
+    "@felte/validator-yup": "^1.0.8",
     "@suid/material": "^0.3.1",
     "solid-app-router": "^0.3.3",
-    "solid-js": "^1.4.2"
+    "solid-js": "^1.4.2",
+    "yup": "^0.32.11"
   }
 }
