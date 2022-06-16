@@ -17,28 +17,24 @@ const rows = [
   },
 ];
 
-const Notes: Component = () => {
-  return (
-    <div>
-      <Button>sd</Button>
-      all notes
-      <Table cols={cols}>
-        {mapArray(
-          () => rows,
-          (row) => (
-            <TableRow
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                {row.title}
-              </TableCell>
-              <TableCell align="right">{row.tags.join(', ')}</TableCell>
-            </TableRow>
-          )
-        )}
-      </Table>
-    </div>
-  );
-};
+const Notes: Component = () => (
+  <div>
+    <Button>sd</Button>
+    all notes
+    <Table cols={cols}>
+      {mapArray(
+        () => rows,
+        (row) => (
+          <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+            <TableCell component="th" scope="row">
+              {row.title}
+            </TableCell>
+            <TableCell align="right">{row.tags.join(', ')}</TableCell>
+          </TableRow>
+        )
+      )}
+    </Table>
+  </div>
+);
 
 export default Notes;
