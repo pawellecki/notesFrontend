@@ -1,8 +1,8 @@
-import { Component } from 'solid-js';
+import { Component, JSXElement } from 'solid-js';
 import MuiButton from '@suid/material/Button';
 
 type Props = {
-  children: string;
+  children: JSXElement;
   type?: 'button' | 'submit';
   onClick?: () => void;
 };
