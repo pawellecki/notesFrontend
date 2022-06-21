@@ -7,7 +7,11 @@ import Box from '@suid/material/Box';
 import Typography from '@suid/material/Typography';
 import Input from '../../components/Form/Input/Input';
 import Button from '../../components/Button/Button';
-import { setIsLoggedIn } from '../../../globalStore';
+import {
+  setIsLoggedIn,
+  setLoggedInUser,
+  setAllNotes,
+} from '../../../globalStore';
 
 const Auth: Component = () => {
   const [isLoginView, setIsLoginView] = createSignal(true);
@@ -33,15 +37,20 @@ const Auth: Component = () => {
               }),
             }
           );
-
           const responseData = await response.json();
-
+          const { name, image, email, notes } = responseData.user;
           setIsLoading(false);
 
           if (!response.ok) {
             return toast.error(responseData.message);
           }
 
+          setLoggedInUser({
+            name,
+            image,
+            email,
+          });
+          setAllNotes(notes);
           setIsLoggedIn(true);
         } catch (err) {
           toast.error(err.message || 'Something went wrong');

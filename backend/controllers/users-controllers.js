@@ -1,7 +1,6 @@
 const { validationResult } = require('express-validator');
 
 const HttpError = require('../models/http-error');
-const user = require('../models/user');
 const User = require('../models/user');
 
 const getUsers = async (req, res, next) => {
@@ -61,20 +60,20 @@ const signup = async (req, res, next) => {
 const login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  let existingUser;
+  let user;
   try {
-    existingUser = await User.findOne({ email });
+    user = await User.findOne({ email }).populate('notes');
   } catch (err) {
     return next(new HttpError('logging in failed, try again later', 500));
   }
 
-  if (!existingUser || existingUser.password !== password) {
+  if (!user || user.password !== password) {
     return next(
       new HttpError('invalid credentials, could not log you in', 401)
     );
   }
 
-  res.json({ message: 'logged in' });
+  res.json({ message: 'logged in', user });
 };
 
 exports.getUsers = getUsers;

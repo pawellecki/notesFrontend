@@ -18,6 +18,7 @@
     "@felte/solid": "^1.2.2",
     "@felte/validator-yup": "^1.0.8",
     "@suid/material": "^0.3.1",
+    "mongoose": "^6.4.0",
     "solid-app-router": "^0.3.3",
     "solid-js": "^1.4.2",
     "solid-toast": "^0.1.4",
