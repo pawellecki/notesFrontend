@@ -38,12 +38,13 @@ const Auth: Component = () => {
             }
           );
           const responseData = await response.json();
-          const { name, image, email, notes } = responseData.user;
-          setIsLoading(false);
 
           if (!response.ok) {
+            setIsLoading(false);
             return toast.error(responseData.message);
           }
+
+          const { name, image, email, notes } = responseData.user;
 
           setLoggedInUser({
             name,
@@ -53,8 +54,9 @@ const Auth: Component = () => {
           setAllNotes(notes);
           setIsLoggedIn(true);
         } catch (err) {
-          toast.error(err.message || 'Something went wrong');
           setIsLoading(false);
+
+          toast.error(err.message || 'Something went wrong');
         }
       } else {
         try {
@@ -106,35 +108,37 @@ const Auth: Component = () => {
       <Input label="Password" name="password" type="password" />
     </>
   );
+  console.log('isLoadingaaa', isLoading());
 
   return (
     <>
-      {isLoading() && <CircularProgress />}
-      {!isLoading() && (
-        <div style={{ display: 'flex', 'justify-content': 'center' }}>
-          <form
-            use:form
-            style={{
-              display: 'flex',
-              'flex-direction': 'column',
-              width: '300px',
-            }}
-          >
-            {isLoginView() && loginInputs}
-            {!isLoginView() && registerInputs}
-            <Button type="submit">
-              {isLoginView() && 'Log in'}
-              {!isLoginView() && 'Register'}
-            </Button>
-          </form>
-        </div>
-      )}
+      {JSON.stringify(isLoading())}
+      <div style={{ display: 'flex', 'justify-content': 'center' }}>
+        <form
+          use:form
+          style={{
+            display: 'flex',
+            'flex-direction': 'column',
+            width: '300px',
+          }}
+        >
+          {isLoginView() && loginInputs}
+          {!isLoginView() && registerInputs}
+          <Button type="submit" isLoading={isLoading()}>
+            {isLoginView() && 'Log in'}
+            {!isLoginView() && 'Register'}
+          </Button>
+        </form>
+      </div>
       <Box>
         <Typography>
           {isLoginView() && "Don't have an account?"}
           {!isLoginView() && 'Already have an account?'}
         </Typography>
-        <Button onClick={() => setIsLoginView((prev) => !prev)}>
+        <Button
+          onClick={() => setIsLoginView((prev) => !prev)}
+          isDisabled={isLoading()}
+        >
           {isLoginView() && 'Sign up'}
           {!isLoginView() && 'Log in'}
         </Button>

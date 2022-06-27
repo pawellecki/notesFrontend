@@ -1,7 +1,6 @@
 import { Component, mapArray } from 'solid-js';
 import TableCell from '@suid/material/TableCell';
 import TableRow from '@suid/material/TableRow';
-import Button from '../../components/Button/Button';
 import Table from '../../components/Table/Table';
 import { allNotes } from '../../../globalStore';
 
@@ -10,7 +9,6 @@ const cols = ['title', 'tags'];
 const Notes: Component = () => {
   return (
     <div>
-      <Button>sd</Button>
       all notes
       <Table cols={cols}>
         {mapArray(
