@@ -44,14 +44,19 @@ const Auth: Component = () => {
             return toast.error(responseData.message);
           }
 
-          const { name, image, email, notes } = responseData.user;
+          const {
+            userId,
+            email,
+            token,
+            //notes
+          } = responseData.user;
 
           setLoggedInUser({
-            name,
-            image,
+            userId,
             email,
+            token,
           });
-          setAllNotes(notes);
+          // setAllNotes(notes);
           setIsLoggedIn(true);
         } catch (err) {
           setIsLoading(false);
