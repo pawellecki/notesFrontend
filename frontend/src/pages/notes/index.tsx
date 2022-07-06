@@ -1,8 +1,11 @@
 import { Component, mapArray } from 'solid-js';
+import Link from '@suid/material/Link';
+import Button from '@suid/material/Button';
 import TableCell from '@suid/material/TableCell';
 import TableRow from '@suid/material/TableRow';
 import Table from '../../components/Table/Table';
 import { allNotes } from '../../../globalStore';
+import TextEditor from '../../components/TextEditor/TextEditor';
 
 const cols = ['title', 'tags'];
 
@@ -10,7 +13,16 @@ const Notes: Component = () => {
   return (
     <div>
       all notes
-      <Table cols={cols}>
+      <Link class="nav" href="/notes/new">
+        Create note
+      </Link>
+      {!allNotes().length && (
+        <div>
+          This is an example note
+          <TextEditor hasTestContents />
+        </div>
+      )}
+      {/* <Table cols={cols}>
         {mapArray(
           () => allNotes(),
           (row) => (
@@ -24,7 +36,7 @@ const Notes: Component = () => {
             </TableRow>
           )
         )}
-      </Table>
+      </Table> */}
     </div>
   );
 };

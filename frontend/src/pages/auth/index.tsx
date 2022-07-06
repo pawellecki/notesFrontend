@@ -49,7 +49,7 @@ const Auth: Component = () => {
             email,
             token,
             //notes
-          } = responseData.user;
+          } = responseData;
 
           setLoggedInUser({
             userId,
@@ -113,11 +113,9 @@ const Auth: Component = () => {
       <Input label="Password" name="password" type="password" />
     </>
   );
-  console.log('isLoadingaaa', isLoading());
 
   return (
     <>
-      {JSON.stringify(isLoading())}
       <div style={{ display: 'flex', 'justify-content': 'center' }}>
         <form
           use:form
