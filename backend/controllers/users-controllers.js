@@ -88,7 +88,7 @@ const login = async (req, res, next) => {
   }
 
   if (!user) {
-    return next(new HttpError('check credentials, could not log you in', 401));
+    return next(new HttpError('check credentials1, could not log you in', 401));
   }
 
   let isValidPassword = false;
@@ -99,7 +99,7 @@ const login = async (req, res, next) => {
   }
 
   if (!isValidPassword) {
-    return next(new HttpError('check credentials, could not log you in', 401));
+    return next(new HttpError('check credentials2, could not log you in', 401));
   }
 
   let token;
