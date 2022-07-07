@@ -17,6 +17,8 @@ const getUsers = async (req, res, next) => {
   res.json({ users: users.map((user) => user.toObject({ getters: true })) });
 };
 
+////////////////////////////////////////////////////////////////////////////////////////
+
 const signup = async (req, res, next) => {
   const errors = validationResult(req);
 
@@ -77,6 +79,8 @@ const signup = async (req, res, next) => {
   res.status(201).json({ userId: newUser.id, email: newUser.email, token });
 };
 
+////////////////////////////////////////////////////////////////////////////////////////
+
 const login = async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -113,7 +117,17 @@ const login = async (req, res, next) => {
     return next(new HttpError('logging in failed, try again', 500));
   }
 
-  res.json({ userId: user.id, email: user.email, token });
+  const notesPreview = user.notes
+    .slice(0, 2)
+    .map(({ _id, creatorId, title, contentPreview, tags }) => ({
+      _id,
+      creatorId,
+      title,
+      contentPreview,
+      tags,
+    }));
+
+  res.json({ userId: user.id, email: user.email, notesPreview, token });
 };
 
 exports.getUsers = getUsers;

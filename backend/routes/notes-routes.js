@@ -16,13 +16,19 @@ router.get('/user/:id', getNotesByUserId);
 
 router.post(
   '/',
-  [check('title').not().isEmpty(), check('tags').isLength({ min: 1 })],
+  [
+    check('title').not().isEmpty(),
+    // check('tags').isLength({ min: 1 })
+  ],
   addNote
 );
 
 router.patch(
   '/:id',
-  [check('title').not().isEmpty(), check('tags').isLength({ min: 1 })],
+  [
+    check('title').not().isEmpty(),
+    // check('tags').isLength({ min: 1 })
+  ],
   editNote
 );
 

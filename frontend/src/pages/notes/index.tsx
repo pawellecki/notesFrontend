@@ -4,7 +4,7 @@ import Button from '@suid/material/Button';
 import TableCell from '@suid/material/TableCell';
 import TableRow from '@suid/material/TableRow';
 import Table from '../../components/Table/Table';
-import { allNotes } from '../../../globalStore';
+import { notesPreview } from '../../../globalStore';
 import TextEditor from '../../components/TextEditor/TextEditor';
 
 const cols = ['title', 'tags'];
@@ -16,27 +16,29 @@ const Notes: Component = () => {
       <Link class="nav" href="/notes/new">
         Create note
       </Link>
-      {!allNotes().length && (
+      {!notesPreview().length && (
         <div>
           This is an example note
-          <TextEditor hasTestContents />
+          <TextEditor hasTestContent />
         </div>
       )}
-      {/* <Table cols={cols}>
-        {mapArray(
-          () => allNotes(),
-          (row) => (
-            <TableRow
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                {row.title}
-              </TableCell>
-              <TableCell align="right">{row.tags.join(', ')}</TableCell>
-            </TableRow>
-          )
-        )}
-      </Table> */}
+      {notesPreview().length && (
+        <Table cols={cols}>
+          {mapArray(
+            () => notesPreview(),
+            (row) => (
+              <TableRow
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              >
+                <TableCell component="th" scope="row">
+                  {row.title}
+                </TableCell>
+                <TableCell align="right">{row.tags.join(', ')}</TableCell>
+              </TableRow>
+            )
+          )}
+        </Table>
+      )}
     </div>
   );
 };

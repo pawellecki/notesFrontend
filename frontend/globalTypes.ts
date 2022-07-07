@@ -1,7 +1,16 @@
-import { Types } from 'mongoose';
-
 export type Note = {
+  _id: string;
+  creatorId: string;
+  content: object;
+  contentPreview: string;
   title: string;
   tags: string[];
-  creatorId: Types.ObjectId;
+};
+
+export type NotePreview = Omit<Note, 'content'>;
+
+export type User = {
+  token: string;
+  userId: string;
+  email: string;
 };

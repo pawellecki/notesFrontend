@@ -10,16 +10,21 @@ import Button from '../../components/Button/Button';
 import {
   setIsLoggedIn,
   setLoggedInUser,
-  setAllNotes,
+  setNotesPreview,
 } from '../../../globalStore';
+
+type formValues = {
+  email: string;
+  password: string;
+  name?: string;
+};
 
 const Auth: Component = () => {
   const [isLoginView, setIsLoginView] = createSignal(true);
   const [isLoading, setIsLoading] = createSignal(false);
 
-  // @ts-ignore
   const { form } = createForm({
-    onSubmit: async (values) => {
+    onSubmit: async (values: formValues) => {
       setIsLoading(true);
 
       if (isLoginView()) {
@@ -44,19 +49,15 @@ const Auth: Component = () => {
             return toast.error(responseData.message);
           }
 
-          const {
-            userId,
-            email,
-            token,
-            //notes
-          } = responseData;
+          const { userId, email, token, notesPreview } = responseData;
 
           setLoggedInUser({
+            token,
             userId,
             email,
-            token,
           });
-          // setAllNotes(notes);
+
+          setNotesPreview(notesPreview);
           setIsLoggedIn(true);
         } catch (err) {
           setIsLoading(false);

@@ -33,7 +33,7 @@ export const options = {
   theme: 'snow',
 };
 
-export const testContents = {
+export const testContent = {
   ops: [
     {
       insert: 'regular text\n',

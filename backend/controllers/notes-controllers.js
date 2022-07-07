@@ -48,11 +48,11 @@ const addNote = async (req, res, next) => {
     return next(new HttpError('Invalid inputs passed, check dataa', 422));
   }
 
-  const { title, content, creatorId } = req.body;
-
+  const { title, content, contentPreview, creatorId } = req.body;
   const newNote = new Note({
     title,
     content,
+    contentPreview,
     // tags,
     //   image: { type: String, required: true },
     creatorId,

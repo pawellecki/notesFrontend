@@ -1,10 +1,10 @@
-import { Component, createSignal, onMount } from 'solid-js';
+import type { Component } from 'solid-js';
+import { onMount } from 'solid-js';
 import Quill from 'quill';
 import Box from '@suid/material/Box';
 import '../../../node_modules/quill/dist/quill.snow.css';
 import hljs from 'highlight.js';
-import Button from '@suid/material/Button';
-import { options, testContents } from './const';
+import { options, testContent } from './const';
 
 // hljs.configure({d
 //   // optionally configure hljs
@@ -12,42 +12,31 @@ import { options, testContents } from './const';
 // });
 
 type Props = {
-  hasTestContents?: boolean;
-  submit?: (contents: string) => void;
+  onChange?: (content: object, contentPreview: string) => void;
+  hasTestContent?: boolean;
 };
 
-const TextEditor: Component<Props> = ({ submit, hasTestContents }) => {
-  const [quill, setQuill] = createSignal();
-
+const TextEditor: Component<Props> = ({ onChange, hasTestContent }) => {
+  let newQuill;
   onMount(() => {
-    const newQuill = new Quill('#quill', options);
+    newQuill = new Quill('#quill', options);
 
-    if (hasTestContents) {
-      newQuill.setContents(testContents);
+    if (hasTestContent) {
+      newQuill.setContents(testContent);
     }
     // setTimeout(() => {
     //  quill = new Quill('#quill', options);
     // return setQuill(newQuill);
-    setQuill(newQuill);
-  });
-  console.log('submit', submit);
+    // setQuill(newQuill);
 
-  quill() &&
-    quill().on('text-change', function (delta, oldDelta, source) {
-      console.log('qqqq', delta);
-      console.log('oldDelta', oldDelta);
-      console.log('source', source);
-      if (source == 'api') {
-      } else if (source == 'user') {
-        console.log('A user action triggered this change.');
-      }
+    newQuill.on('text-change', function (delta, oldDelta, source) {
+      onChange(newQuill.getContents(), newQuill.getText(0, 100));
+      // if (source == 'api') {
+      // } else if (source == 'user') {
+      //   console.log('A user action triggered this change.');
+      // }
     });
-
-  const handleSubmit = () => {
-    console.log(quill().getContents());
-    const stringifyContent = JSON.stringify(quill().getContents());
-    submit(stringifyContent);
-  };
+  });
 
   // setTimeout(() => {
   //   const options = {
@@ -56,8 +45,6 @@ const TextEditor: Component<Props> = ({ submit, hasTestContents }) => {
 
   return (
     <Box sx={{ border: '2px solid blue' }}>
-      <Button onClick={handleSubmit}>save</Button>
-      {/* <div id="editorjs">fff</div> */}
       <div id="toolbar"></div>
       <div id="quill"></div>
     </Box>

@@ -1,15 +1,82 @@
-import type { Component } from 'solid-js';
+import { Component, createSignal } from 'solid-js';
+import { createForm } from '@felte/solid';
+import toast from 'solid-toast';
 import TextEditor from '../../components/TextEditor/TextEditor';
+import Input from '../../components/Form/Input/Input';
+import Button from '../../components/Button/Button';
+import { loggedInUser } from '../../../globalStore';
+
+type formValues = {
+  title: string;
+};
+
+type TextEditorContent = {
+  content: object;
+  contentPreview: string;
+};
 
 const NewNote: Component = () => {
-  const submit = (contents: string) => {
-    console.log('con', contents);
-  };
+  const [isLoading, setIsLoading] = createSignal(false);
+  const [editorContent, setEditorContent] = createSignal<TextEditorContent>({
+    content: {},
+    contentPreview: '',
+  });
+
+  const { form } = createForm({
+    onSubmit: async (values: formValues) => {
+      setIsLoading(true);
+
+      try {
+        const response = await fetch('http://localhost:5000/api/notes', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title: values.title,
+            content: JSON.stringify(editorContent().content),
+            contentPreview: editorContent().contentPreview,
+            tags: [],
+            creatorId: loggedInUser().userId,
+          }),
+        });
+        const responseData = await response.json();
+
+        if (!response.ok) {
+          setIsLoading(false);
+          return toast.error(responseData.message);
+        }
+
+        toast.success('Saved');
+      } catch (err) {
+        toast.error(err.message || 'Something went wrong');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+  });
 
   return (
     <div>
       <p>new note</p>
-      <TextEditor submit={submit} />
+      <form
+        use:form
+        style={{
+          display: 'flex',
+          'flex-direction': 'column',
+          width: '300px',
+        }}
+      >
+        <Input label="Title" name="title" />
+        <TextEditor
+          onChange={(content, contentPreview) =>
+            setEditorContent({ content, contentPreview })
+          }
+        />
+        <Button type="submit" isLoading={isLoading()}>
+          sub new
+        </Button>
+      </form>
     </div>
   );
 };
