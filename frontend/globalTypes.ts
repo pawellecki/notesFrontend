@@ -14,3 +14,8 @@ export type User = {
   userId: string;
   email: string;
 };
+
+export type TextEditorContentWithPreview = {
+  content: object;
+  contentPreview: string;
+};

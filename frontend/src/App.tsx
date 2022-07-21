@@ -3,10 +3,10 @@ import { Routes, Route } from 'solid-app-router';
 import { Toaster } from 'solid-toast';
 import styles from './App.module.css';
 import Tinder from './pages/tinder';
-import Notes from './pages/notes';
-import NewNote from './pages/newNote';
-import UpdateNote from './pages/updateNote';
-import Auth from './pages/auth';
+import Notes from './pages/notes/notes';
+import NewNote from './pages/newNote/newNote';
+import UpdateNote from './pages/updateNote/updateNotes';
+import Auth from './pages/auth/auth';
 import { isLoggedIn } from '../globalStore';
 
 const App: Component = () => (
@@ -19,7 +19,7 @@ const App: Component = () => (
       <Routes>
         <Route path="/" element={<Notes />} />
         <Route path="/tinder" element={<Tinder />} />
-        <Route path="/:userId/notes" element={<UpdateNote />} />
+        {/* <Route path="/:userId/notes" element={<UpdateNote />} /> */}
         <Route path="/notes/new" element={<NewNote />} />
         <Route path="/notes/:id" element={<UpdateNote />} />
       </Routes>

@@ -5,25 +5,22 @@ import TextEditor from '../../components/TextEditor/TextEditor';
 import Input from '../../components/Form/Input/Input';
 import Button from '../../components/Button/Button';
 import { loggedInUser } from '../../../globalStore';
+import { TextEditorContentWithPreview } from '../../../globalTypes';
 
-type formValues = {
+type FormValues = {
   title: string;
-};
-
-type TextEditorContent = {
-  content: object;
-  contentPreview: string;
 };
 
 const NewNote: Component = () => {
   const [isLoading, setIsLoading] = createSignal(false);
-  const [editorContent, setEditorContent] = createSignal<TextEditorContent>({
-    content: {},
-    contentPreview: '',
-  });
+  const [editorContent, setEditorContent] =
+    createSignal<TextEditorContentWithPreview>({
+      content: {},
+      contentPreview: '',
+    });
 
   const { form } = createForm({
-    onSubmit: async (values: formValues) => {
+    onSubmit: async (values: FormValues) => {
       setIsLoading(true);
 
       try {

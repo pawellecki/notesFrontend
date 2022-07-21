@@ -90,13 +90,15 @@ const editNote = async (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return next(new HttpError('Invalid inputs passed, check data', 422));
+    return next(new HttpError('Invalid inputs passed, check datavs', 422));
   }
 
   const {
     title,
     // tags,
     content,
+    contentPreview,
+    creatorId,
   } = req.body;
   const { id } = req.params;
 
@@ -110,12 +112,16 @@ const editNote = async (req, res, next) => {
 
   note.title = title;
   note.content = content;
+  note.contentPreview = contentPreview;
+  note.creatorId = creatorId;
   // note.tags = tags;
 
   try {
     await note.save();
   } catch (err) {
-    return next(new HttpError('Edit failed, could not save changes', 500));
+    return next(
+      new HttpError(err + 'Edit failed, could not save changes', 500)
+    );
   }
 
   res.status(201).json({ note: note.toObject({ getters: true }) });
