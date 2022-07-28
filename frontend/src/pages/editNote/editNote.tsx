@@ -1,5 +1,5 @@
 import type { Component } from 'solid-js';
-import { createSignal, onMount, createEffect } from 'solid-js';
+import { createSignal, onMount } from 'solid-js';
 import { useLocation } from 'solid-app-router';
 import toast from 'solid-toast';
 import { createForm } from '@felte/solid';
@@ -8,13 +8,12 @@ import { loggedInUser } from '../../../globalStore';
 import TextEditor from '../../components/TextEditor/TextEditor';
 import Button from '../../components/Button/Button';
 import Input from '../../components/Form/Input/Input';
-import CircularProgress from '@suid/material/CircularProgress';
 
 type FormValues = {
   title: string;
 };
 
-const UpdateNote: Component = () => {
+const EditNote: Component = () => {
   const [title, setTitle] = createSignal('');
   const [isLoading, setIsLoading] = createSignal(false);
   const [startContent, setStartContent] = createSignal('');
@@ -123,4 +122,4 @@ const UpdateNote: Component = () => {
   );
 };
 
-export default UpdateNote;
+export default EditNote;

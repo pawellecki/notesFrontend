@@ -1,25 +1,51 @@
-import { Component, mapArray } from 'solid-js';
+import { Component, createSignal, mapArray } from 'solid-js';
+import toast from 'solid-toast';
 import Link from '@suid/material/Link';
 import Grid from '@suid/material/Grid';
 import Button from '@suid/material/Button';
-import TableCell from '@suid/material/TableCell';
-import TableRow from '@suid/material/TableRow';
-import Table from '../../components/Table/Table';
-import { notesPreview } from '../../../globalStore';
+import { notesPreview, setNotesPreview } from '../../../globalStore';
 import TextEditor from '../../components/TextEditor/TextEditor';
 import Typography from '@suid/material/Typography';
 
-const cols = ['title', 'tags'];
-
-const deleteNote = (id: string) => {
-  console.log('iddd', id);
-};
-
 const Notes: Component = () => {
+  const [isLoading, setIsLoading] = createSignal(false);
+
+  const deleteNote = async (id: string) => {
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/notes/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const { id: deletedNoteId } = await response.json();
+
+      setIsLoading(false);
+
+      if (!response.ok) {
+        return toast.error('delete error');
+      }
+
+      toast.success('note deleted');
+
+      setNotesPreview((prev) =>
+        prev.filter((note) => note._id !== deletedNoteId)
+      );
+    } catch (err) {
+      toast.error(err.message || 'Something went wrong');
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div>
       all notes
       <Link href="/notes/new">Create note</Link>
+      <br />
+      <br />
+      <br />
       {!notesPreview().length && (
         <div>
           This is an example note
@@ -28,7 +54,6 @@ const Notes: Component = () => {
       )}
       {notesPreview().length && (
         <Grid container spacing={4}>
-          {/* <Table cols={cols}> */}
           {mapArray(
             () => notesPreview(),
             (row) => (
@@ -53,26 +78,14 @@ const Notes: Component = () => {
                       bottom: '10px',
                       right: '10px',
                     }}
+                    disabled={isLoading()}
                   >
                     X
                   </Button>
                 </div>
               </Grid>
-              // <TableRow
-              //   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              // >
-              //   <TableCell component="th" scope="row">
-              //     <Link href={`/notes/${row._id}`}>{row.title}</Link>
-              //   </TableCell>
-              //   <TableCell align="right">
-              //     <Link href={`/notes/${row._id}`}>
-              //       {row.tags.join(', ')}js, react
-              //     </Link>
-              //   </TableCell>
-              // </TableRow>
             )
           )}
-          {/* </Table> */}
         </Grid>
       )}
     </div>

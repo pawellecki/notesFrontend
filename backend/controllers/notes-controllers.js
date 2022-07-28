@@ -83,7 +83,7 @@ const addNote = async (req, res, next) => {
     return next(new HttpError('Did not add new note2', 500));
   }
 
-  res.status(201).json({ note: newNote });
+  res.status(201).json({ newNote });
 };
 
 const editNote = async (req, res, next) => {

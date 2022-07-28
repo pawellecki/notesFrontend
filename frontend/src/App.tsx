@@ -5,7 +5,7 @@ import styles from './App.module.css';
 import Tinder from './pages/tinder';
 import Notes from './pages/notes/notes';
 import NewNote from './pages/newNote/newNote';
-import UpdateNote from './pages/updateNote/updateNotes';
+import EditNote from './pages/editNote/editNote';
 import Auth from './pages/auth/auth';
 import { isLoggedIn } from '../globalStore';
 
@@ -21,7 +21,7 @@ const App: Component = () => (
         <Route path="/tinder" element={<Tinder />} />
         {/* <Route path="/:userId/notes" element={<UpdateNote />} /> */}
         <Route path="/notes/new" element={<NewNote />} />
-        <Route path="/notes/:id" element={<UpdateNote />} />
+        <Route path="/notes/:id" element={<EditNote />} />
       </Routes>
     )}
 

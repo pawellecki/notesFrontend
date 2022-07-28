@@ -6,6 +6,7 @@ import Input from '../../components/Form/Input/Input';
 import Button from '../../components/Button/Button';
 import { loggedInUser } from '../../../globalStore';
 import { TextEditorContentWithPreview } from '../../../globalTypes';
+import { setNotesPreview } from '../../../globalStore';
 
 type FormValues = {
   title: string;
@@ -37,13 +38,15 @@ const NewNote: Component = () => {
             creatorId: loggedInUser().userId,
           }),
         });
-        const responseData = await response.json();
+        const { message, newNote } = await response.json();
+        const { content, ...newNoteWithoutContent } = newNote;
 
         if (!response.ok) {
           setIsLoading(false);
-          return toast.error(responseData.message);
+          return toast.error(message);
         }
 
+        setNotesPreview((prev) => [newNoteWithoutContent, ...prev]);
         toast.success('Saved');
       } catch (err) {
         toast.error(err.message || 'Something went wrong');

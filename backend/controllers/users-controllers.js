@@ -117,15 +117,15 @@ const login = async (req, res, next) => {
     return next(new HttpError('logging in failed, try again', 500));
   }
 
-  const notesPreview = user.notes
-    .slice(0, 2)
-    .map(({ _id, creatorId, title, contentPreview, tags }) => ({
+  const notesPreview = user.notes.map(
+    ({ _id, creatorId, title, contentPreview, tags }) => ({
       _id,
       creatorId,
       title,
       contentPreview,
       tags,
-    }));
+    })
+  );
 
   res.json({ userId: user.id, email: user.email, notesPreview, token });
 };
