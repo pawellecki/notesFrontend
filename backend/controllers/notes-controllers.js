@@ -74,7 +74,7 @@ const addNote = async (req, res, next) => {
     session.startTransaction();
 
     await newNote.save({ session });
-    user.notes.push(newNote);
+    user.notes = [newNote, ...user.notes];
 
     await user.save({ session });
 
@@ -122,6 +122,33 @@ const editNote = async (req, res, next) => {
     return next(
       new HttpError(err + 'Edit failed, could not save changes', 500)
     );
+  }
+
+  let user;
+  try {
+    user = await User.findById(creatorId);
+  } catch (err) {
+    return next(new HttpError('Did not add new note1', 500));
+  }
+
+  if (!user) {
+    return next(new HttpError('Could not find author of note', 404));
+  }
+
+  try {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    const notesIdsWithoutEditedId = user.notes.filter(
+      (noteId) => noteId.toString() !== id
+    );
+    user.notes = [id, ...notesIdsWithoutEditedId];
+
+    await user.save({ session });
+
+    await session.commitTransaction();
+  } catch (err) {
+    return next(new HttpError('Did not add new note2', 500));
   }
 
   res.status(201).json({ note: note.toObject({ getters: true }) });

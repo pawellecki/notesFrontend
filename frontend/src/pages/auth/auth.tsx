@@ -13,7 +13,7 @@ import {
   setNotesPreview,
 } from '../../../globalStore';
 
-type formValues = {
+type FormValues = {
   email: string;
   password: string;
   name?: string;
@@ -24,7 +24,7 @@ const Auth: Component = () => {
   const [isLoading, setIsLoading] = createSignal(false);
 
   const { form } = createForm({
-    onSubmit: async (values: formValues) => {
+    onSubmit: async (values: FormValues) => {
       setIsLoading(true);
 
       if (isLoginView()) {
