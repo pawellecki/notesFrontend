@@ -27,6 +27,8 @@ const TextEditor: Component<Props> = (props) => {
       newQuill.setContents(testContent);
     }
     newQuill.on('text-change', function (delta, oldDelta, source) {
+      if (source !== 'user') return;
+
       props.onChange &&
         props.onChange(newQuill.getContents(), newQuill.getText(0, 100));
     });

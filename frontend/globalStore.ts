@@ -1,8 +1,10 @@
 import { createSignal } from 'solid-js';
-import { NotePreview, User } from './globalTypes';
+import { NotePreview, LoggedInUser, User } from './globalTypes';
 
 export const [isLoggedIn, setIsLoggedIn] = createSignal(false);
 
-export const [loggedInUser, setLoggedInUser] = createSignal<User>();
-
 export const [notesPreview, setNotesPreview] = createSignal<NotePreview[]>([]);
+
+export const [loggedInUser, setLoggedInUser] = createSignal<LoggedInUser>();
+
+export const [users, setUsers] = createSignal<User[]>([]);

@@ -9,10 +9,16 @@ export type Note = {
 
 export type NotePreview = Omit<Note, 'content'>;
 
-export type User = {
+export type LoggedInUser = {
   token: string;
   userId: string;
   email: string;
+};
+
+export type User = {
+  name: string;
+  email: string;
+  id: string;
 };
 
 export type TextEditorContentWithPreview = {

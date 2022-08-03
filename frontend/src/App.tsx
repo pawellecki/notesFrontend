@@ -3,10 +3,10 @@ import { Routes, Route } from 'solid-app-router';
 import { Toaster } from 'solid-toast';
 import styles from './App.module.css';
 import Tinder from './pages/tinder';
-import Notes from './pages/notes/notes';
-import NewNote from './pages/newNote/newNote';
-import EditNote from './pages/editNote/editNote';
-import Auth from './pages/auth/auth';
+import Notes from './pages/notes/Notes';
+import NewNote from './pages/newNote/NewNote';
+import EditNote from './pages/editNote/EditNote';
+import Auth from './pages/auth/Auth';
 import { isLoggedIn } from '../globalStore';
 
 const App: Component = () => (
