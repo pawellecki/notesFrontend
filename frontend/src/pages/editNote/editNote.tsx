@@ -2,24 +2,22 @@ import type { Component } from 'solid-js';
 import { createSignal, onMount } from 'solid-js';
 import { useLocation } from 'solid-app-router';
 import toast from 'solid-toast';
+import Typography from '@suid/material/Typography';
 import { createForm } from '@felte/solid';
 import { TextEditorContentWithPreview } from '../../../globalTypes';
 import { loggedInUser } from '../../../globalStore';
 import TextEditor from '../../components/TextEditor/TextEditor';
 import Button from '../../components/Button/Button';
 import Input from '../../components/Form/Input/Input';
-import {
-  notesPreview,
-  setNotesPreview,
-  users,
-  setUsers,
-} from '../../../globalStore';
+import { notesPreview, setNotesPreview, setUsers } from '../../../globalStore';
 import ModalShareNote from './ModalShareNote';
 
 const EditNote: Component = () => {
   const [title, setTitle] = createSignal('');
-  const [isLoading, setIsLoading] = createSignal(false);
+  const [isLoading, setIsLoading] = createSignal();
   const [isShareOpen, setIsShareOpen] = createSignal(false);
+  const [noteCreatorEmail, setNoteCreatorEmail] = createSignal('');
+  const [sharedWith, setSharedWith] = createSignal([]);
   const [startContent, setStartContent] = createSignal('');
   const [editorContent, setEditorContent] =
     createSignal<TextEditorContentWithPreview>({
@@ -31,35 +29,7 @@ const EditNote: Component = () => {
   const noteId = pathname.split('/')[2];
 
   onMount(() => {
-    const getNote = async () => {
-      setIsLoading(true);
-
-      try {
-        const response = await fetch(
-          `http://localhost:5000/api/notes/${noteId}`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-        const { note } = await response.json();
-
-        setIsLoading(false);
-
-        if (!response.ok) {
-          return toast.error(note.message);
-        }
-
-        setTitle(note.title);
-        setStartContent(note.content);
-      } catch (err) {
-        toast.error(err.message || 'Something went wrong');
-        setIsLoading(false);
-      }
-    };
-
-    const getUsers = async () => {
+    const getUsers = async (noteCreatorId: string) => {
       try {
         const response = await fetch(`http://localhost:5000/api/users`, {
           headers: {
@@ -73,19 +43,57 @@ const EditNote: Component = () => {
           return toast.error(users.message);
         }
 
+        if (noteCreatorId !== loggedInUser()?.userId) {
+          const noteCreator = users.find((user) => user._id === noteCreatorId);
+
+          setNoteCreatorEmail(noteCreator.email);
+        } else {
+          setNoteCreatorEmail('loggedInUser');
+        }
+
         setUsers(users);
       } catch (err) {
         toast.error(err.message || 'Something went wrong');
       }
     };
 
+    const getNote = async () => {
+      setIsLoading('true');
+
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/notes/${noteId}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        const { note } = await response.json();
+
+        setIsLoading();
+
+        if (!response.ok) {
+          return toast.error(note.message);
+        }
+
+        getUsers(note.creatorId);
+
+        setTitle(note.title);
+        setSharedWith(note.sharedWith);
+        setStartContent(note.content);
+      } catch (err) {
+        toast.error(err.message || 'Something went wrong');
+        setIsLoading();
+      }
+    };
+
     getNote();
-    getUsers();
   });
 
   const { form } = createForm<{ title: string }>({
     onSubmit: async () => {
-      setIsLoading(true);
+      setIsLoading('true');
 
       const bodyWithoutContent = {
         title: title(),
@@ -111,12 +119,13 @@ const EditNote: Component = () => {
         );
 
         const { note } = await response.json();
-        const { _id, creatorId, contentPreview, title, tags } = note;
+        const { _id, creatorId, contentPreview, title, tags, sharedWith } =
+          note;
 
-        setIsLoading(false);
+        setIsLoading();
 
         if (!response.ok) {
-          return toast.error('kot');
+          return toast.error('Something went wrong');
         }
 
         const updatedNotePreview = {
@@ -125,6 +134,7 @@ const EditNote: Component = () => {
           contentPreview,
           title,
           tags,
+          sharedWith,
         };
 
         const notesWithoutUpdatedNote = notesPreview().filter(
@@ -135,7 +145,7 @@ const EditNote: Component = () => {
         toast.success('saved');
       } catch (err) {
         toast.error(err.message || 'Something went wrong');
-        setIsLoading(false);
+        setIsLoading();
       }
     },
   });
@@ -162,7 +172,12 @@ const EditNote: Component = () => {
             update note
           </Button>
         </form>
-        <Button onClick={() => setIsShareOpen(true)}>share this note</Button>
+        {noteCreatorEmail() && (
+          <Typography>Created by {noteCreatorEmail()}</Typography>
+        )}
+        {noteCreatorEmail() === 'loggedInUser' && (
+          <Button onClick={() => setIsShareOpen(true)}>share this note</Button>
+        )}
         <TextEditor
           content={startContent()}
           onChange={(content, contentPreview) =>
@@ -174,6 +189,8 @@ const EditNote: Component = () => {
       <ModalShareNote
         isOpen={isShareOpen()}
         noteId={noteId}
+        sharedWith={sharedWith()}
+        setSharedWith={setSharedWith}
         onClose={() => setIsShareOpen(false)}
       />
     </>

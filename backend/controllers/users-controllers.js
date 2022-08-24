@@ -118,12 +118,13 @@ const login = async (req, res, next) => {
   }
 
   const notesPreview = user.notes.map(
-    ({ _id, creatorId, title, contentPreview, tags }) => ({
+    ({ _id, creatorId, title, contentPreview, tags, sharedWith }) => ({
       _id,
       creatorId,
       title,
       contentPreview,
       tags,
+      sharedWith,
     })
   );
 

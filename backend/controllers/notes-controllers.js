@@ -90,7 +90,7 @@ const editNote = async (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return next(new HttpError('Invalid inputs passed, check datavs', 422));
+    return next(new HttpError('Error while edit', 422));
   }
 
   const {
@@ -154,6 +154,74 @@ const editNote = async (req, res, next) => {
   res.status(201).json({ note: note.toObject({ getters: true }) });
 };
 
+const shareNote = async (req, res, next) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return next(new HttpError("Couldn't share", 500));
+  }
+
+  const { targetUserId } = req.body;
+  const { id: noteId } = req.params;
+
+  let note;
+
+  try {
+    note = await Note.findById(noteId);
+  } catch (err) {
+    return next(new HttpError('Share failed, could not find note', 500));
+  }
+
+  const isAlreadyShared = note.sharedWith.includes(targetUserId);
+  if (isAlreadyShared) {
+    note.sharedWith = note.sharedWith.filter(
+      (id) => id.toString() !== targetUserId
+    );
+  } else {
+    note.sharedWith = [...note.sharedWith, targetUserId];
+  }
+
+  try {
+    await note.save();
+  } catch (err) {
+    return next(
+      new HttpError(err + 'Share failed, could not save changes', 500)
+    );
+  }
+
+  let targetUser;
+  try {
+    targetUser = await User.findById(targetUserId);
+  } catch (err) {
+    return next(new HttpError('Share failed', 500));
+  }
+
+  if (!targetUser) {
+    return next(new HttpError('Could not find user to share', 404));
+  }
+
+  try {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    if (isAlreadyShared) {
+      targetUser.notes = targetUser.notes.filter(
+        (id) => id.toString() !== noteId
+      );
+    } else {
+      targetUser.notes = [...targetUser.notes, noteId];
+    }
+
+    await targetUser.save({ session });
+
+    await session.commitTransaction();
+  } catch (err) {
+    return next(new HttpError('Did not share note, 500'));
+  }
+
+  res.status(201).json({ sharedWith: note.sharedWith });
+};
+
 const deleteNote = async (req, res, next) => {
   const { id } = req.params;
 
@@ -188,4 +256,5 @@ exports.getNoteById = getNoteById;
 exports.getNotesByUserId = getNotesByUserId;
 exports.addNote = addNote;
 exports.editNote = editNote;
+exports.shareNote = shareNote;
 exports.deleteNote = deleteNote;

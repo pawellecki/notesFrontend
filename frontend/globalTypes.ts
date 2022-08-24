@@ -5,6 +5,7 @@ export type Note = {
   contentPreview: string;
   title: string;
   tags: string[];
+  sharedWith: string[];
 };
 
 export type NotePreview = Omit<Note, 'content'>;

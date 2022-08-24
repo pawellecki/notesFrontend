@@ -6,6 +6,7 @@ const {
   getNotesByUserId,
   addNote,
   editNote,
+  shareNote,
   deleteNote,
 } = require('../controllers/notes-controllers');
 
@@ -30,6 +31,14 @@ router.patch(
     // check('tags').isLength({ min: 1 })
   ],
   editNote
+);
+
+router.patch(
+  '/:id/share',
+  [
+    // check('shareWith').not().isEmpty(),
+  ],
+  shareNote
 );
 
 router.delete('/:id', deleteNote);

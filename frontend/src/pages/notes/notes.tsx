@@ -6,6 +6,7 @@ import Button from '@suid/material/Button';
 import { notesPreview, setNotesPreview } from '../../../globalStore';
 import TextEditor from '../../components/TextEditor/TextEditor';
 import Typography from '@suid/material/Typography';
+import shareIcon from '../../assets/share.svg';
 
 const Notes: Component = () => {
   const [isLoading, setIsLoading] = createSignal(false);
@@ -52,7 +53,7 @@ const Notes: Component = () => {
           <TextEditor hasTestContent />
         </div>
       )}
-      {notesPreview().length && (
+      {!!notesPreview().length && (
         <Grid container spacing={4}>
           {mapArray(
             () => notesPreview(),
@@ -69,6 +70,9 @@ const Notes: Component = () => {
                     }}
                   >
                     <Typography variant="h6">{row.title}</Typography>
+                    <Typography variant="h6">
+                      {!!row.sharedWith.length && <img src={shareIcon} />}
+                    </Typography>
                     <Typography>{row.contentPreview}</Typography>
                   </Link>
                   <Button
