@@ -1,6 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const io = require('socket.io')(3001, {
+  cors: {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+  },
+});
 
 const notesRoutes = require('./routes/notes-routes');
 const usersRoutes = require('./routes/users-routes');
@@ -10,6 +16,16 @@ const HttpError = require('./models/http-error');
 const app = express();
 
 app.use(bodyParser.json());
+
+io.on('connection', (socket) => {
+  socket.on('get-document', (noteId) => {
+    socket.join(noteId);
+
+    socket.on('send-changes', (delta) => {
+      socket.broadcast.to(noteId).emit('receive-changes', delta);
+    });
+  });
+});
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -44,6 +60,7 @@ app.use((error, req, res, next) => {
 
 const databaseConnectionString =
   'mongodb+srv://mstdnt:3aARLDDf9byotZe4@cluster0.hqats.mongodb.net/nextNotes?retryWrites=true&w=majority';
+
 mongoose
   .connect(databaseConnectionString)
   .then(() => {

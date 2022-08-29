@@ -179,6 +179,7 @@ const EditNote: Component = () => {
           <Button onClick={() => setIsShareOpen(true)}>share this note</Button>
         )}
         <TextEditor
+          noteId={noteId}
           content={startContent()}
           onChange={(content, contentPreview) =>
             setEditorContent({ content, contentPreview })

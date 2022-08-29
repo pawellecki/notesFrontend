@@ -1,10 +1,11 @@
 import type { Component } from 'solid-js';
-import { onMount, createEffect } from 'solid-js';
+import { onMount, onCleanup, createEffect } from 'solid-js';
 import Quill from 'quill';
 import Box from '@suid/material/Box';
 import '../../../node_modules/quill/dist/quill.snow.css';
 import hljs from 'highlight.js';
 import { options, testContent } from './const';
+import { io } from 'socket.io-client';
 
 // hljs.configure({d
 //   // optionally configure hljs
@@ -12,6 +13,7 @@ import { options, testContent } from './const';
 // });
 
 type Props = {
+  noteId?: string;
   content?: string;
   onChange?: (content: object, contentPreview: string) => void;
   hasTestContent?: boolean;
@@ -19,6 +21,7 @@ type Props = {
 
 const TextEditor: Component<Props> = (props) => {
   let newQuill: any;
+  let socket: any;
 
   onMount(() => {
     newQuill = new Quill('#quill', options);
@@ -26,11 +29,31 @@ const TextEditor: Component<Props> = (props) => {
     if (props.hasTestContent) {
       newQuill.setContents(testContent);
     }
-    newQuill.on('text-change', function (delta, oldDelta, source) {
+
+    socket = io('http://localhost:3001');
+
+    const onTextChange = (delta, oldDelta, source) => {
       if (source !== 'user') return;
 
       props.onChange &&
         props.onChange(newQuill.getContents(), newQuill.getText(0, 100));
+
+      socket.emit('send-changes', delta);
+    };
+
+    const onReceiveTextChange = (delta) => {
+      newQuill.updateContents(delta);
+    };
+
+    newQuill.on('text-change', onTextChange);
+    socket.on('receive-changes', onReceiveTextChange);
+
+    props.noteId && socket.emit('get-document', props.noteId);
+
+    onCleanup(() => {
+      socket.disconnect();
+      newQuill.off('text-change', onTextChange);
+      newQuill.off('receive-changes', onReceiveTextChange);
     });
   });
 
