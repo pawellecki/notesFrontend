@@ -1,4 +1,4 @@
-import { Component, createSignal, mapArray } from 'solid-js';
+import { Component, onMount, createSignal, mapArray } from 'solid-js';
 import toast from 'solid-toast';
 import Link from '@suid/material/Link';
 import Grid from '@suid/material/Grid';
@@ -7,9 +7,44 @@ import { notesPreview, setNotesPreview } from '../../../globalStore';
 import TextEditor from '../../components/TextEditor/TextEditor';
 import Typography from '@suid/material/Typography';
 import shareIcon from '../../assets/share.svg';
+import { loggedInUser } from '../../../globalStore';
 
 const Notes: Component = () => {
-  const [isLoading, setIsLoading] = createSignal(false);
+  const [isLoading, setIsLoading] = createSignal(true);
+
+  onMount(() => {
+    const getNotes = async () => {
+      const { userId } = JSON.parse(localStorage.getItem('userData') ?? '');
+
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/users/${userId}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + loggedInUser()?.token,
+            },
+          }
+        );
+        const data = await response.json();
+
+        setIsLoading(false);
+
+        if (!response.ok) {
+          return toast.error("couldn't get user");
+        }
+
+        setNotesPreview(data.notesPreview);
+      } catch (err) {
+        toast.error(err.message || 'Something went wrong');
+        setIsLoading(false);
+      }
+    };
+
+    if (notesPreview().length === 0) {
+      getNotes();
+    }
+  });
 
   const deleteNote = async (id: string) => {
     setIsLoading(true);
@@ -19,6 +54,7 @@ const Notes: Component = () => {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + loggedInUser()?.token,
         },
       });
       const { id: deletedNoteId } = await response.json();
@@ -57,11 +93,11 @@ const Notes: Component = () => {
         <Grid container spacing={4}>
           {mapArray(
             () => notesPreview(),
-            (row) => (
+            (el) => (
               <Grid item xs={4}>
                 <div style={{ position: 'relative', height: '400px' }}>
                   <Link
-                    href={`/notes/${row._id}`}
+                    href={`/notes/${el._id}`}
                     style={{
                       display: 'block',
                       // width: 200,
@@ -69,20 +105,21 @@ const Notes: Component = () => {
                       border: '2px solid grey',
                     }}
                   >
-                    <Typography variant="h6">{row.title}</Typography>
+                    <Typography variant="h6">{el.title}</Typography>
                     <Typography variant="h6">
-                      {!!row.sharedWith.length && <img src={shareIcon} />}
+                      {!!el.sharedWith?.length && <img src={shareIcon} />}
                     </Typography>
-                    <Typography>{row.contentPreview}</Typography>
+                    <Typography>{el.contentPreview}</Typography>
                   </Link>
+
                   <Button
-                    onClick={() => deleteNote(row._id)}
+                    onClick={() => deleteNote(el._id)}
                     style={{
                       position: 'absolute',
                       bottom: '10px',
                       right: '10px',
                     }}
-                    disabled={isLoading()}
+                    // disabled={isLoading()} //TODO
                   >
                     X
                   </Button>

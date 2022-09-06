@@ -12,6 +12,8 @@ import { io } from 'socket.io-client';
 //   languages: ['javascript', 'ruby', 'python'],
 // });
 
+//TODO dorobic save interval w quill
+
 type Props = {
   noteId?: string;
   content?: string;
@@ -63,6 +65,9 @@ const TextEditor: Component<Props> = (props) => {
 
     if (props.content && isFetchedContent && isQuillSet) {
       newQuill.setContents(JSON.parse(props.content), 'api');
+
+      props.onChange &&
+        props.onChange(newQuill.getContents(), newQuill.getText(0, 100));
     }
   });
 

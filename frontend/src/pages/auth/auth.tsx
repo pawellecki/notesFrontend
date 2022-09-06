@@ -7,11 +7,7 @@ import Box from '@suid/material/Box';
 import Typography from '@suid/material/Typography';
 import Input from '../../components/Form/Input/Input';
 import Button from '../../components/Button/Button';
-import {
-  setIsLoggedIn,
-  setLoggedInUser,
-  setNotesPreview,
-} from '../../../globalStore';
+import { setLoggedInUser, setNotesPreview } from '../../../globalStore';
 
 type FormValues = {
   email: string;
@@ -51,14 +47,29 @@ const Auth: Component = () => {
 
           const { userId, email, token, notesPreview } = responseData;
 
+          const userData = localStorage.getItem('userData') ?? '';
+          const { expiration } = (userData && JSON.parse(userData)) ?? {};
+          const newExpiration = new Date(
+            new Date().getTime() + 1000 * 60 * 60
+          ).toISOString();
+          const tokenExpirationDate = expiration || newExpiration;
+
+          localStorage.setItem(
+            'userData',
+            JSON.stringify({
+              userId,
+              email,
+              token,
+              expiration: tokenExpirationDate,
+            })
+          );
+
           setLoggedInUser({
             token,
             userId,
             email,
           });
-
           setNotesPreview(notesPreview);
-          setIsLoggedIn(true);
         } catch (err) {
           setIsLoading(false);
 
@@ -88,8 +99,6 @@ const Auth: Component = () => {
           if (!response.ok) {
             return toast.error(responseData.message);
           }
-
-          setIsLoggedIn(true);
         } catch (err) {
           toast.error(err.message || 'Something went wrong');
           setIsLoading(false);

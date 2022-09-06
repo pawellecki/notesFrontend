@@ -19,6 +19,7 @@ const EditNote: Component = () => {
   const [noteCreatorEmail, setNoteCreatorEmail] = createSignal('');
   const [sharedWith, setSharedWith] = createSignal([]);
   const [startContent, setStartContent] = createSignal('');
+  const [noteCreatorId, setNoteCreatorId] = createSignal();
   const [editorContent, setEditorContent] =
     createSignal<TextEditorContentWithPreview>({
       content: {},
@@ -80,6 +81,7 @@ const EditNote: Component = () => {
         getUsers(note.creatorId);
 
         setTitle(note.title);
+        setNoteCreatorId(note.creatorId);
         setSharedWith(note.sharedWith);
         setStartContent(note.content);
       } catch (err) {
@@ -98,7 +100,7 @@ const EditNote: Component = () => {
       const bodyWithoutContent = {
         title: title(),
         contentPreview: editorContent().contentPreview,
-        creatorId: loggedInUser()?.userId,
+        creatorId: noteCreatorId(),
       };
 
       const body = {
@@ -113,14 +115,16 @@ const EditNote: Component = () => {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + loggedInUser()?.token,
             },
             body: JSON.stringify(body),
           }
         );
 
-        const { note } = await response.json();
+        const data = await response.json();
+
         const { _id, creatorId, contentPreview, title, tags, sharedWith } =
-          note;
+          data.note || {};
 
         setIsLoading();
 
@@ -186,7 +190,6 @@ const EditNote: Component = () => {
           }
         />
       </div>
-
       <ModalShareNote
         isOpen={isShareOpen()}
         noteId={noteId}

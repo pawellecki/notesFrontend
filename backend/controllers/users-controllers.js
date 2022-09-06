@@ -5,6 +5,35 @@ const jwt = require('jsonwebtoken');
 const HttpError = require('../models/http-error');
 const User = require('../models/user');
 
+const getUserById = async (req, res, next) => {
+  const userId = req.params.userId;
+
+  let user;
+  try {
+    user = await User.findById(userId).populate('notes');
+  } catch (err) {
+    return next(new HttpError("couldn't find user", 500));
+  }
+
+  if (!user) {
+    return next(new HttpError("couldn't find user with this id", 500));
+  }
+
+  const notesPreview = user.notes.map(
+    ({ _id, creatorId, title, contentPreview, tags, sharedWith }) => ({
+      _id,
+      creatorId,
+      title,
+      contentPreview,
+      tags,
+      sharedWith,
+    })
+  );
+  res.json({ userId: user.id, email: user.email, notesPreview });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////
+
 const getUsers = async (req, res, next) => {
   let users;
 
@@ -92,7 +121,7 @@ const login = async (req, res, next) => {
   }
 
   if (!user) {
-    return next(new HttpError('check credentials1, could not log you in', 401));
+    return next(new HttpError('check credentials1, could not log you in', 403));
   }
 
   let isValidPassword = false;
@@ -103,7 +132,7 @@ const login = async (req, res, next) => {
   }
 
   if (!isValidPassword) {
-    return next(new HttpError('check credentials2, could not log you in', 401));
+    return next(new HttpError('check credentials, could not log you in', 403));
   }
 
   let token;
@@ -131,6 +160,7 @@ const login = async (req, res, next) => {
   res.json({ userId: user.id, email: user.email, notesPreview, token });
 };
 
+exports.getUserById = getUserById;
 exports.getUsers = getUsers;
 exports.signup = signup;
 exports.login = login;

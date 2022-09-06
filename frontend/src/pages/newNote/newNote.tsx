@@ -29,13 +29,14 @@ const NewNote: Component = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + loggedInUser()?.token,
           },
           body: JSON.stringify({
             title: values.title,
             content: JSON.stringify(editorContent().content),
             contentPreview: editorContent().contentPreview,
             tags: [],
-            creatorId: loggedInUser().userId,
+            creatorId: loggedInUser()?.userId,
           }),
         });
         const { message, newNote } = await response.json();

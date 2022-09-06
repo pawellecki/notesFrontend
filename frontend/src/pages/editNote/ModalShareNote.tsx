@@ -47,6 +47,7 @@ const ModalShareNote: Component<Props> = (props) => {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + loggedInUser()?.token,
           },
           body: JSON.stringify(body),
         }

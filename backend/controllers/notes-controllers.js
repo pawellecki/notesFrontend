@@ -41,6 +41,8 @@ const getNotesByUserId = async (req, res, next) => {
   res.json({ notes: notes.map((note) => note.toObject({ getters: true })) });
 };
 
+///////////////////////////////////////////////////////////////////////
+
 const addNote = async (req, res, next) => {
   const errors = validationResult(req);
 
@@ -86,13 +88,14 @@ const addNote = async (req, res, next) => {
   res.status(201).json({ newNote });
 };
 
+///////////////////////////////////////////////////////////////////////
+
 const editNote = async (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
     return next(new HttpError('Error while edit', 422));
   }
-
   const {
     title,
     // tags,
@@ -108,6 +111,14 @@ const editNote = async (req, res, next) => {
     note = await Note.findById(id);
   } catch (err) {
     return next(new HttpError('Edit failed, could not find note', 500));
+  }
+
+  const youAreNotNoteCreator =
+    note.creatorId.toString() !== req.userData.userId;
+  const noteIsNotSharedWithYou = !note.sharedWith.includes(req.userData.userId);
+
+  if (youAreNotNoteCreator && noteIsNotSharedWithYou) {
+    return next(new HttpError('You are not allowed to edit this note', 401));
   }
 
   note.title = title;
@@ -153,6 +164,8 @@ const editNote = async (req, res, next) => {
 
   res.status(201).json({ note: note.toObject({ getters: true }) });
 };
+
+///////////////////////////////////////////////////////////////////////
 
 const shareNote = async (req, res, next) => {
   const errors = validationResult(req);
@@ -222,6 +235,8 @@ const shareNote = async (req, res, next) => {
   res.status(201).json({ sharedWith: note.sharedWith });
 };
 
+///////////////////////////////////////////////////////////////////////
+
 const deleteNote = async (req, res, next) => {
   const { id } = req.params;
 
@@ -234,6 +249,14 @@ const deleteNote = async (req, res, next) => {
 
   if (!note) {
     return next(new HttpError('Could not find and delete this note', 404));
+  }
+
+  const youAreNotNoteCreator =
+    note.creatorId.toString() !== req.userData.userId;
+  const noteIsNotSharedWithYou = !note.sharedWith.includes(req.userData.userId);
+
+  if (youAreNotNoteCreator && noteIsNotSharedWithYou) {
+    return next(new HttpError('You are not allowed to delete this note', 401));
   }
 
   try {

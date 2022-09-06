@@ -1,5 +1,6 @@
 const express = require('express');
 const { check } = require('express-validator');
+const checkAuth = require('../middleware/check-auth');
 
 const {
   getNoteById,
@@ -14,6 +15,8 @@ const router = express.Router();
 
 router.get('/:id', getNoteById);
 router.get('/user/:id', getNotesByUserId);
+
+router.use(checkAuth);
 
 router.post(
   '/',
