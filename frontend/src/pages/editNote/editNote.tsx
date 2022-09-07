@@ -32,7 +32,7 @@ const EditNote: Component = () => {
   onMount(() => {
     const getUsers = async (noteCreatorId: string) => {
       try {
-        const response = await fetch(`http://localhost:5000/api/users`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URI}/users`, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -63,7 +63,7 @@ const EditNote: Component = () => {
 
       try {
         const response = await fetch(
-          `http://localhost:5000/api/notes/${noteId}`,
+          `${import.meta.env.VITE_API_URI}/notes/${noteId}`,
           {
             headers: {
               'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ const EditNote: Component = () => {
 
       try {
         const response = await fetch(
-          `http://localhost:5000/api/notes/${noteId}`,
+          `${import.meta.env.VITE_API_URI}/notes/${noteId}`,
           {
             method: 'PATCH',
             headers: {

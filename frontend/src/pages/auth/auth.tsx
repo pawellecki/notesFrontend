@@ -26,7 +26,7 @@ const Auth: Component = () => {
       if (isLoginView()) {
         try {
           const response = await fetch(
-            'http://localhost:5000/api/users/login',
+            `${import.meta.env.VITE_API_URI}/users/login`,
             {
               method: 'POST',
               headers: {
@@ -78,7 +78,7 @@ const Auth: Component = () => {
       } else {
         try {
           const response = await fetch(
-            'http://localhost:5000/api/users/signup',
+            `${import.meta.env.VITE_API_URI}/users/signup`,
             {
               method: 'POST',
               headers: {

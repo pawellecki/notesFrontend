@@ -18,7 +18,7 @@ const Notes: Component = () => {
 
       try {
         const response = await fetch(
-          `http://localhost:5000/api/users/${userId}`,
+          `${import.meta.env.VITE_API_URI}/users/${userId}`,
           {
             headers: {
               'Content-Type': 'application/json',
@@ -50,13 +50,16 @@ const Notes: Component = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`http://localhost:5000/api/notes/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + loggedInUser()?.token,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URI}/notes/${id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + loggedInUser()?.token,
+          },
+        }
+      );
       const { id: deletedNoteId } = await response.json();
 
       setIsLoading(false);

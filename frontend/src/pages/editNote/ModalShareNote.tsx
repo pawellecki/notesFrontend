@@ -42,7 +42,7 @@ const ModalShareNote: Component<Props> = (props) => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/notes/${noteId}/share`,
+        `${import.meta.env.VITE_API_URI}/notes/${noteId}/share`,
         {
           method: 'PATCH',
           headers: {
