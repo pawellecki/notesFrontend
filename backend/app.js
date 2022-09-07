@@ -58,8 +58,7 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || 'Unknown error' });
 });
 
-const databaseConnectionString =
-  'mongodb+srv://mstdnt:3aARLDDf9byotZe4@cluster0.hqats.mongodb.net/nextNotes?retryWrites=true&w=majority';
+const databaseConnectionString = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.hqats.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
 mongoose
   .connect(databaseConnectionString)

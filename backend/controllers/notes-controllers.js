@@ -50,19 +50,19 @@ const addNote = async (req, res, next) => {
     return next(new HttpError('Invalid inputs passed, check dataa', 422));
   }
 
-  const { title, content, contentPreview, creatorId } = req.body;
+  const { title, content, contentPreview } = req.body;
   const newNote = new Note({
     title,
     content,
     contentPreview,
     // tags,
     //   image: { type: String, required: true },
-    creatorId,
+    creatorId: req.userData.userId,
   });
 
   let user;
   try {
-    user = await User.findById(creatorId);
+    user = await User.findById(req.userData.userId);
   } catch (err) {
     return next(new HttpError('Did not add new note1', 500));
   }
